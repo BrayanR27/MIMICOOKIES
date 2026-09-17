@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mimi Cookies - Panel de Gestión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        cream: '#fdfbf7',
+                        beige: '#f4efe6',
+                        caramel: '#c17f59',
+                        chocolate: {
+                            DEFAULT: '#5c3d2e',
+                            dark: '#4a3022',
+                            light: '#8a644f'
+                        },
+                        gold: '#d4af37'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #fdfbf7; color: #4a3022; }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(92, 61, 46, 0.08), 0 8px 10px -6px rgba(92, 61, 46, 0.04); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-btn.active { background-color: #5c3d2e; color: #fdfbf7; box-shadow: 0 4px 6px -1px rgba(92, 61, 46, 0.2); }
+        .nav-btn { transition: all 0.2s; }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f4efe6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #c17f59; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8a644f; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row">
+
+    <!-- Sidebar Navigation -->
+    <nav class="w-full md:w-64 lg:w-72 bg-beige border-r border-caramel/20 flex-shrink-0 flex flex-col md:h-screen md:sticky top-0 z-40">
+        <div class="p-6 text-center border-b border-caramel/20">
+            <div class="w-20 h-20 mx-auto bg-chocolate text-cream rounded-full flex items-center justify-center text-3xl mb-3 shadow-lg border-2 border-gold">
+                <i class="fa-solid fa-cookie-bite"></i>
+            </div>
+            <h1 class="font-serif text-2xl font-bold text-chocolate tracking-wide">Mimi Cookies</h1>
+            <p class="text-xs font-medium text-caramel uppercase tracking-widest mt-1">Gestión Premium</p>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-4 space-y-1 md:space-y-2 flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible">
+            <button onclick="changeTab('dashboard')" class="nav-btn active flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl font-medium text-sm text-chocolate hover:bg-caramel/10 whitespace-nowrap md:whitespace-normal" id="btn-dashboard">
+                <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
+            </button>
+            <button onclick="changeTab('costos')" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl font-medium text-sm text-chocolate hover:bg-caramel/10 whitespace-nowrap md:whitespace-normal" id="btn-costos">
+                <i class="fa-solid fa-receipt w-5 text-center"></i> Costos e Insumos
+            </button>
+            <button onclick="changeTab('salsas')" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl font-medium text-sm text-chocolate hover:bg-caramel/10 whitespace-nowrap md:whitespace-normal" id="btn-salsas">
+                <i class="fa-solid fa-droplet w-5 text-center"></i> Salsas
+            </button>
+            <button onclick="changeTab('empaque')" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl font-medium text-sm text-chocolate hover:bg-caramel/10 whitespace-nowrap md:whitespace-normal" id="btn-empaque">
+                <i class="fa-solid fa-box-open w-5 text-center"></i> Empaque
+            </button>
+            <button onclick="changeTab('inventario')" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl font-medium text-sm text-chocolate hover:bg-caramel/10 whitespace-nowrap md:whitespace-normal" id="btn-inventario">
+                <i class="fa-solid fa-boxes-stacked w-5 text-center"></i> Inventario & Despensa
+            </button>
+            <button onclick="changeTab('ventas')" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl font-medium text-sm text-chocolate hover:bg-caramel/10 whitespace-nowrap md:whitespace-normal" id="btn-ventas">
+                <i class="fa-solid fa-store w-5 text-center"></i> Ventas
+            </button>
+            <button onclick="changeTab('recetas')" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl font-medium text-sm text-chocolate hover:bg-caramel/10 whitespace-nowrap md:whitespace-normal" id="btn-recetas">
+                <i class="fa-solid fa-book-open w-5 text-center"></i> Producción
+            </button>
+            <button onclick="changeTab('precio')" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl font-medium text-sm text-chocolate hover:bg-caramel/10 whitespace-nowrap md:whitespace-normal" id="btn-precio">
+                <i class="fa-solid fa-tag w-5 text-center"></i> Precios y Ganancia
+            </button>
+            <button onclick="changeTab('mano')" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl font-medium text-sm text-chocolate hover:bg-caramel/10 whitespace-nowrap md:whitespace-normal" id="btn-mano">
+                <i class="fa-solid fa-stopwatch w-5 text-center"></i> Tiempo y Energía
+            </button>
+        </div>
+
+        <div class="p-4 border-t border-caramel/20 flex flex-col gap-2">
+            <button onclick="guardarDatosLocales(true)" class="w-full bg-caramel/20 hover:bg-caramel/30 text-chocolate px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i> Forzar Guardado
+            </button>
+            <button onclick="restaurarDatosPorDefecto()" class="w-full bg-red-100 hover:bg-red-200 text-red-800 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-rotate-left"></i> Reiniciar App
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto w-full max-w-6xl mx-auto">
+        
+        <!-- 1. DASHBOARD -->
+        <section id="tab-dashboard" class="tab-content active space-y-6">
+            <div>
+                <h2 class="font-serif text-3xl font-bold text-chocolate">Dashboard General</h2>
+                <p class="text-sm text-amber-900/70">Resumen del rendimiento de Mimi Cookies.</p>
+            </div>
+
+            <!-- KPIs -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl card-shadow border border-caramel/10 relative overflow-hidden group">
+                    <div class="absolute -right-4 -bottom-4 text-beige text-6xl opacity-30 group-hover:scale-110 transition-transform"><i class="fa-solid fa-wallet"></i></div>
+                    <p class="text-xs font-bold text-caramel uppercase tracking-wider mb-1">Ingresos Totales</p>
+                    <h3 id="dash-ingresos" class="text-2xl font-serif font-bold text-chocolate">$0</h3>
+                </div>
+                <div class="bg-white p-5 rounded-2xl card-shadow border border-caramel/10 relative overflow-hidden group">
+                    <div class="absolute -right-4 -bottom-4 text-beige text-6xl opacity-30 group-hover:scale-110 transition-transform"><i class="fa-solid fa-chart-line"></i></div>
+                    <p class="text-xs font-bold text-caramel uppercase tracking-wider mb-1">Ganancia Neta</p>
+                    <h3 id="dash-ganancia" class="text-2xl font-serif font-bold text-green-700">$0</h3>
+                </div>
+                <div class="bg-white p-5 rounded-2xl card-shadow border border-caramel/10 relative overflow-hidden group">
+                    <div class="absolute -right-4 -bottom-4 text-beige text-6xl opacity-30 group-hover:scale-110 transition-transform"><i class="fa-solid fa-box-open"></i></div>
+                    <p class="text-xs font-bold text-caramel uppercase tracking-wider mb-1">Paquetes Vendidos</p>
+                    <h3 id="dash-vendidos" class="text-2xl font-serif font-bold text-chocolate">0</h3>
+                </div>
+                <div class="bg-white p-5 rounded-2xl card-shadow border border-caramel/10 relative overflow-hidden group">
+                    <div class="absolute -right-4 -bottom-4 text-beige text-6xl opacity-30 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cubes"></i></div>
+                    <p class="text-xs font-bold text-caramel uppercase tracking-wider mb-1">Stock Disponible</p>
+                    <h3 id="dash-stock" class="text-2xl font-serif font-bold text-chocolate">0 <span class="text-sm font-normal">paquetes</span></h3>
+                </div>
+            </div>
+
+            <!-- Ventas por Día de la Semana -->
+            <div class="bg-white rounded-2xl card-shadow border border-caramel/20 overflow-hidden mt-8">
+                <div class="p-5 border-b border-caramel/10 bg-beige/30 flex justify-between items-center">
+                    <h3 class="font-serif text-lg font-bold text-chocolate"><i class="fa-regular fa-calendar-days mr-2 text-caramel"></i> Rendimiento por Día</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-beige text-chocolate text-xs uppercase tracking-wider">
+                                <th class="p-4">Día de la Semana</th>
+                                <th class="p-4 text-center">Paquetes Vendidos</th>
+                                <th class="p-4 text-right">Ingresos</th>
+                                <th class="p-4 text-right">Ganancia Est.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-dias" class="divide-y divide-beige text-sm">
+                            <!-- JS inyecta esto -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. COSTOS DE PRODUCCIÓN -->
+        <section id="tab-costos" class="tab-content space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="font-serif text-3xl font-bold text-chocolate">Costos de Producción</h2>
+                    <p class="text-sm text-amber-900/70">Ingredientes y materiales comprados. (Al editar aquí, se actualizan las Salsas y Empaques).</p>
+                </div>
+                <button onclick="abrirModalInsumo()" class="bg-chocolate hover:bg-chocolate-dark text-cream px-4 py-2 rounded-xl text-sm font-medium shadow flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-plus"></i> Añadir Insumo
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl card-shadow border border-caramel/20 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-beige text-chocolate text-xs uppercase tracking-wider border-b border-caramel/20">
+                                <th class="p-3.5">Insumo / Ingrediente</th>
+                                <th class="p-3.5 text-right">Precio Compra</th>
+                                <th class="p-3.5 text-center">Presentación</th>
+                                <th class="p-3.5 text-center">Uso por Tanda</th>
+                                <th class="p-3.5 text-right">Costo por Tanda</th>
+                                <th class="p-3.5 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-costos-ingredientes" class="divide-y divide-beige text-sm">
+                            <!-- Datos dinámicos -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-beige/60 font-bold text-chocolate border-t-2 border-caramel/30">
+                                <td colspan="4" class="p-4 text-right">Costo Total de Insumos por Tanda:</td>
+                                <td id="total-costo-general" class="p-4 text-right text-base text-chocolate">$0</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SALSAS -->
+        <section id="tab-salsas" class="tab-content space-y-6">
+            <div>
+                <h2 class="font-serif text-3xl font-bold text-chocolate">Preparación de Salsas</h2>
+                <p class="text-sm text-amber-900/70">Costos vinculados automáticamente desde tu lista de insumos principales.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white rounded-2xl card-shadow border border-caramel/20 p-6 space-y-4">
+                    <h3 class="font-serif text-xl font-bold text-chocolate border-b pb-2">Ingredientes de la Salsa (Por Tanda)</h3>
+                    <div class="space-y-3" id="salsas-ingredientes-list">
+                        <!-- JS inyecta dinamicamente buscando IDs 4(Crema), 5(Leche), 3(Cacao), 9(Mantequilla) -->
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl card-shadow border border-caramel/20 p-6 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <h3 class="font-serif text-xl font-bold text-chocolate border-b pb-2">Resumen de Salsa</h3>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-amber-900/80">Ingredientes base:</span>
+                            <span id="salsa-ing-total" class="font-bold text-chocolate">$0</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-amber-900/80">Recipientes plásticos:</span>
+                            <span id="salsa-recipientes-costo" class="font-bold text-chocolate">$0</span>
+                        </div>
+                        <div class="flex justify-between text-sm border-t pt-2 font-bold text-chocolate">
+                            <span>Costo total por tanda:</span>
+                            <span id="salsa-total-final">$0</span>
+                        </div>
+                    </div>
+                    <div class="bg-beige/60 p-4 rounded-xl mt-6">
+                        <p class="text-xs text-chocolate"><i class="fa-solid fa-circle-info text-caramel mr-1"></i> Cada paquete incluye 2 recipientes individuales de salsa.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. EMPAQUE -->
+        <section id="tab-empaque" class="tab-content space-y-6">
+            <div>
+                <h2 class="font-serif text-3xl font-bold text-chocolate">Control de Empaques</h2>
+                <p class="text-sm text-amber-900/70">Materiales utilizados para presentar el producto.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="empaque-cards-container">
+                <!-- JS inyecta envases(ID 7) y recipientes(ID 8) -->
+            </div>
+        </section>
+
+        <!-- 5. INVENTARIO Y DESPENSA -->
+        <section id="tab-inventario" class="tab-content space-y-6">
+            <div>
+                <h2 class="font-serif text-3xl font-bold text-chocolate">Gestión de Inventario</h2>
+                <p class="text-sm text-amber-900/70">Controla tus galletas listas para vender y los ingredientes en tu alacena.</p>
+            </div>
+
+            <!-- Producto Terminado -->
+            <div class="bg-white rounded-2xl card-shadow border border-caramel/20 p-6 flex flex-col md:flex-row items-center gap-6">
+                <div class="w-24 h-24 bg-beige rounded-full flex items-center justify-center text-4xl text-chocolate border-4 border-gold/30">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <div class="flex-1 w-full">
+                    <h3 class="font-serif text-xl font-bold text-chocolate mb-4">Stock de Producto Terminado (Paquetes)</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div class="bg-beige/40 p-3 rounded-xl">
+                            <p class="text-xs font-bold text-amber-900 uppercase">Producidos</p>
+                            <p id="inv-producidos" class="text-lg font-bold text-chocolate">0</p>
+                        </div>
+                        <div class="bg-beige/40 p-3 rounded-xl">
+                            <p class="text-xs font-bold text-amber-900 uppercase">Vendidos</p>
+                            <p id="inv-vendidos" class="text-lg font-bold text-chocolate">0</p>
+                        </div>
+                        <div class="bg-caramel/20 p-3 rounded-xl border border-caramel/30">
+                            <p class="text-xs font-bold text-chocolate uppercase">Disponibles</p>
+                            <p id="inv-disponibles" class="text-xl font-bold text-chocolate">0</p>
+                        </div>
+                        <div class="bg-gold/20 p-3 rounded-xl border border-gold/40">
+                            <p class="text-xs font-bold text-chocolate uppercase">Valor Venta Stock</p>
+                            <p id="inv-valor" class="text-lg font-bold text-chocolate">$0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Despensa y Lista de Compras -->
+            <div class="bg-white rounded-2xl card-shadow border border-caramel/20 overflow-hidden">
+                <div class="p-5 border-b border-caramel/10 bg-beige/30 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-serif text-lg font-bold text-chocolate"><i class="fa-solid fa-basket-shopping mr-2 text-caramel"></i> Despensa y Lista de Compras</h3>
+                        <p class="text-xs text-amber-900/80">Escribe cuánto tienes. El sistema te dirá cuánto falta para hacer 1 tanda.</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-white text-chocolate text-xs uppercase tracking-wider border-b border-caramel/20">
+                                <th class="p-3.5">Ingrediente</th>
+                                <th class="p-3.5 text-center">Requiere 1 Tanda</th>
+                                <th class="p-3.5 text-center bg-beige/40">Tienes en Casa</th>
+                                <th class="p-3.5 text-center">Falta Comprar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-despensa" class="divide-y divide-beige text-sm">
+                            <!-- JS Inyecta Despensa -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. VENTAS -->
+        <section id="tab-ventas" class="tab-content space-y-6">
+            <div>
+                <h2 class="font-serif text-3xl font-bold text-chocolate">Registro de Ventas</h2>
+                <p class="text-sm text-amber-900/70">Registra cuándo vendes paquetes para descontarlos del inventario.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl card-shadow border border-caramel/20 p-6 flex flex-col md:flex-row gap-4 items-end">
+                <div class="w-full md:w-1/3">
+                    <label class="block text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">Fecha de Venta</label>
+                    <input type="date" id="venta-fecha" class="w-full p-3 rounded-xl border border-caramel/30 focus:border-caramel focus:ring-1 focus:ring-caramel outline-none bg-beige/20 text-chocolate">
+                </div>
+                <div class="w-full md:w-1/3">
+                    <label class="block text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">Cantidad de Paquetes</label>
+                    <input type="number" id="venta-cantidad" min="1" class="w-full p-3 rounded-xl border border-caramel/30 focus:border-caramel outline-none bg-beige/20 text-chocolate" placeholder="Ej. 2">
+                </div>
+                <div class="w-full md:w-1/3">
+                    <button onclick="registrarVenta()" class="w-full bg-chocolate hover:bg-chocolate-dark text-cream p-3 rounded-xl font-bold shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Registrar Venta
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl card-shadow border border-caramel/20 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-beige text-chocolate text-xs uppercase tracking-wider border-b border-caramel/20">
+                                <th class="p-4">Fecha</th>
+                                <th class="p-4 text-center">Día</th>
+                                <th class="p-4 text-center">Paquetes</th>
+                                <th class="p-4 text-right">Precio Unit.</th>
+                                <th class="p-4 text-right">Total Ingreso</th>
+                                <th class="p-4 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-ventas" class="divide-y divide-beige text-sm">
+                            <!-- Datos de ventas -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. PRECIOS Y GANANCIA -->
+        <section id="tab-precio" class="tab-content space-y-6">
+            <div>
+                <h2 class="font-serif text-3xl font-bold text-chocolate">Precio y Ganancia</h2>
+                <p class="text-sm text-amber-900/70">Calculadora de rentabilidad por paquete.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl card-shadow border border-caramel/20 p-6 max-w-xl mx-auto space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-chocolate mb-2">Precio de Venta por Paquete (COP)</label>
+                    <input type="number" id="precio-venta-input" onchange="actualizarPrecioVenta()" class="w-full p-4 text-2xl font-bold text-center rounded-xl border-2 border-gold focus:border-caramel outline-none bg-beige/20 text-chocolate">
+                </div>
+                
+                <div class="space-y-4 border-t border-beige pt-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-amber-900 font-medium">Costo de Insumos por Tanda:</span>
+                        <span id="resumen-costo-tanda" class="font-bold text-chocolate">$0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-amber-900 font-medium">Paquetes producidos por Tanda:</span>
+                        <span class="font-bold text-chocolate">12 paquetes</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-beige/50 p-3 rounded-lg">
+                        <span class="text-amber-900 font-bold">Costo Unitario (Por Paquete):</span>
+                        <span id="resumen-costo-paquete" class="font-bold text-red-700">$0</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-gold/20 p-4 rounded-xl border border-gold mt-4">
+                        <span class="text-chocolate font-bold text-lg">Ganancia por Paquete:</span>
+                        <span id="resumen-ganancia-paquete" class="font-bold text-green-700 text-xl">$0</span>
+                    </div>
+                </div>
+                <p class="text-xs text-center text-amber-900/60">*Esta ganancia no incluye electricidad ni tu mano de obra (pendientes).</p>
+            </div>
+        </section>
+
+        <!-- 8. PRODUCCIÓN / RECETAS -->
+        <section id="tab-recetas" class="tab-content space-y-6">
+            <div>
+                <h2 class="font-serif text-3xl font-bold text-chocolate">Historial de Producción (Tandas)</h2>
+                <p class="text-sm text-amber-900/70">Registra cada vez que horneas para aumentar el inventario.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl card-shadow border border-caramel/20 p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-amber-900 mb-1">Fecha de Tanda</label>
+                    <input type="date" id="tanda-fecha" class="w-full p-2.5 rounded-xl border border-caramel/30 bg-beige/20 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-amber-900 mb-1">Galletas Horneadas</label>
+                    <input type="number" id="tanda-galletas" class="w-full p-2.5 rounded-xl border border-caramel/30 bg-beige/20 text-sm" placeholder="Ej. 127">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-amber-900 mb-1">Consumo Personal</label>
+                    <input type="number" id="tanda-consumo" class="w-full p-2.5 rounded-xl border border-caramel/30 bg-beige/20 text-sm" placeholder="Ej. 7">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="registrarTanda()" class="w-full bg-chocolate hover:bg-chocolate-dark text-cream p-2.5 rounded-xl text-sm font-bold shadow transition">
+                        Añadir Tanda
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl card-shadow border border-caramel/20 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-beige text-chocolate text-xs uppercase tracking-wider">
+                            <th class="p-3.5">Fecha</th>
+                            <th class="p-3.5 text-center">Horneadas</th>
+                            <th class="p-3.5 text-center">Consumo</th>
+                            <th class="p-3.5 text-center">Galletas Útiles</th>
+                            <th class="p-3.5 text-right font-bold text-caramel">Paquetes (x10)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-tandas" class="divide-y divide-beige text-sm">
+                        <!-- JS inyecta -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 9. MANO DE OBRA -->
+        <section id="tab-mano" class="tab-content space-y-6">
+            <div>
+                <h2 class="font-serif text-3xl font-bold text-chocolate">Tiempo y Energía</h2>
+                <p class="text-sm text-amber-900/70">Sección en construcción. Pendiente de definir valores reales.</p>
+            </div>
+            <div class="bg-cream border-2 border-dashed border-caramel/40 p-8 rounded-2xl text-center">
+                <i class="fa-solid fa-person-digging text-4xl text-caramel mb-4"></i>
+                <h3 class="font-serif text-xl font-bold text-chocolate mb-2">Datos Pendientes</h3>
+                <p class="text-sm text-amber-900/80 mb-4 max-w-md mx-auto">Para calcular con exactitud los gastos de energía y tu salario, necesitamos que definas:</p>
+                <ul class="text-sm text-left inline-block space-y-2 text-amber-900 bg-white p-4 rounded-xl border border-caramel/20 shadow-sm">
+                    <li><i class="fa-solid fa-plug text-caramel w-5"></i> Potencia de la freidora de aire (Watts).</li>
+                    <li><i class="fa-solid fa-money-bill text-caramel w-5"></i> ¿Cuánto quieres ganar por hora de trabajo?</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Insumo -->
+    <div id="modal-insumo" class="fixed inset-0 bg-chocolate/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-cream rounded-3xl max-w-md w-full p-6 card-shadow border border-gold space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3 border-caramel/20">
+                <h3 id="modal-insumo-title" class="font-serif text-xl font-bold text-chocolate">Añadir/Editar Insumo</h3>
+                <button onclick="cerrarModalInsumo()" class="text-amber-900 hover:text-red-700 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3">
+                <input type="hidden" id="insumo-id">
+                <div>
+                    <label class="block text-xs font-bold text-amber-900 mb-1">Nombre del Insumo:</label>
+                    <input type="text" id="insumo-nombre" class="w-full p-2.5 rounded-xl border border-caramel/30 bg-white text-sm" placeholder="Ej. Crema de leche">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-amber-900 mb-1">Precio Compra ($):</label>
+                        <input type="number" id="insumo-precio" class="w-full p-2.5 rounded-xl border border-caramel/30 bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-amber-900 mb-1">Costo por Tanda ($):</label>
+                        <input type="number" id="insumo-costo-tanda" class="w-full p-2.5 rounded-xl border border-caramel/30 bg-white text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-amber-900 mb-1">Presentación (Texto):</label>
+                        <input type="text" id="insumo-presentacion" class="w-full p-2.5 rounded-xl border border-caramel/30 bg-white text-sm" placeholder="Ej. 200 ml">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-amber-900 mb-1">Uso por Tanda (Texto):</label>
+                        <input type="text" id="insumo-uso" class="w-full p-2.5 rounded-xl border border-caramel/30 bg-white text-sm" placeholder="Ej. 200 ml">
+                    </div>
+                </div>
+                <div class="border-t border-caramel/20 pt-3 mt-2">
+                    <p class="text-xs text-chocolate font-bold mb-2"><i class="fa-solid fa-calculator text-caramel"></i> Datos para Despensa Automática</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-amber-900 mb-1">Unidad Medida:</label>
+                            <input type="text" id="insumo-unidad" class="w-full p-2.5 rounded-xl border border-caramel/30 bg-white text-sm" placeholder="Ej. ml, g, unid">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-amber-900 mb-1">Cantidad Uso (N°):</label>
+                            <input type="number" step="any" id="insumo-uso-num" class="w-full p-2.5 rounded-xl border border-caramel/30 bg-white text-sm" title="Solo números para calcular cuánto gastas">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-4 border-t border-caramel/20 mt-4">
+                <button onclick="cerrarModalInsumo()" class="px-4 py-2 rounded-xl text-sm font-medium text-amber-900 bg-white border border-caramel/20 hover:bg-beige">Cancelar</button>
+                <button onclick="guardarInsumo()" class="bg-chocolate hover:bg-chocolate-dark text-cream px-5 py-2 rounded-xl text-sm font-bold shadow">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notificación -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-green-800 text-cream px-6 py-3 rounded-xl shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 font-medium text-sm flex items-center gap-2">
+        <i class="fa-solid fa-check-circle"></i> <span id="toast-msg">Mensaje</span>
+    </div>
+
+    <script>
+        // --- BASE DE DATOS INICIAL ---
+        const datosPorDefecto = {
+            precioVenta: 8000,
+            ingredientes: [
+                { id: 1, nombre: "Betty Crocker Chocolate Chip Cookie Mix", precio: 32000, presentacion: "900 g", uso: "900 g", costoTanda: 32000, stockActual: 0, usoTanda: 900, unidad: "g" },
+                { id: 2, nombre: "Harina de trigo", precio: 2190, presentacion: "500 g", uso: "150 g", costoTanda: 657, stockActual: 0, usoTanda: 150, unidad: "g" },
+                { id: 3, nombre: "Cacao en polvo", precio: 5550, presentacion: "100 g", uso: "40 g", costoTanda: 2220, stockActual: 0, usoTanda: 40, unidad: "g" },
+                { id: 4, nombre: "Crema de leche", precio: 2400, presentacion: "200 ml", uso: "200 ml", costoTanda: 2400, stockActual: 0, usoTanda: 200, unidad: "ml" },
+                { id: 5, nombre: "Leche", precio: 3350, presentacion: "900 ml", uso: "450 ml", costoTanda: 1675, stockActual: 0, usoTanda: 450, unidad: "ml" },
+                { id: 6, nombre: "Papel parafinado", precio: 2000, presentacion: "8 unidades", uso: "4 unidades", costoTanda: 1000, stockActual: 0, usoTanda: 4, unidad: "unid" },
+                { id: 7, nombre: "Envases de cookies", precio: 7700, presentacion: "12 unidades", uso: "12 unidades", costoTanda: 7700, stockActual: 0, usoTanda: 12, unidad: "unid" },
+                { id: 8, nombre: "Recipientes para salsa", precio: 7000, presentacion: "50 unidades", uso: "24 unidades", costoTanda: 3360, stockActual: 0, usoTanda: 24, unidad: "unid" },
+                { id: 9, nombre: "Mantequilla Don Olio", precio: 1400, presentacion: "125 g", uso: "42g (salsa) + 125g (masa)", costoTanda: 1867, stockActual: 0, usoTanda: 167, unidad: "g" }
+            ],
+            ventas: [],
+            tandas: [
+                { id: Date.now(), fecha: "2023-11-01", galletas: 127, consumo: 7, utiles: 120, paquetes: 12 }
+            ]
+        };
+
+        let datosNegocio = JSON.parse(JSON.stringify(datosPorDefecto));
+
+        // --- FUNCIONES DE UTILIDAD ---
+        function formatoCOP(valor) {
+            return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(valor);
+        }
+
+        function mostrarToast(mensaje) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = mensaje;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 3000);
+        }
+
+        function changeTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active', 'bg-chocolate', 'text-cream'); b.classList.add('text-chocolate'); });
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            const btn = document.getElementById('btn-' + tabId);
+            btn.classList.add('active', 'bg-chocolate', 'text-cream');
+            btn.classList.remove('text-chocolate');
+        }
+
+        // --- PERSISTENCIA LOCAL ---
+        function cargarDatosLocales() {
+            const guardado = localStorage.getItem('mimiCookiesData_v3');
+            if (guardado) {
+                datosNegocio = JSON.parse(guardado);
+                // Migración por si faltan campos en versiones viejas
+                if(!datosNegocio.tandas) datosNegocio.tandas = JSON.parse(JSON.stringify(datosPorDefecto.tandas));
+            }
+        }
+
+        function guardarDatosLocales(forzar = false) {
+            localStorage.setItem('mimiCookiesData_v3', JSON.stringify(datosNegocio));
+            if(forzar) mostrarToast("Datos guardados manualmente.");
+        }
+
+        function restaurarDatosPorDefecto() {
+            if(confirm("¿Estás segura? Esto borrará tus ventas, inventario e insumos editados y volverá a los datos de fábrica.")) {
+                datosNegocio = JSON.parse(JSON.stringify(datosPorDefecto));
+                guardarDatosLocales();
+                actualizarTodo();
+                mostrarToast("Aplicación reiniciada.");
+            }
+        }
+
+        // --- CÁLCULOS GLOBALES ---
+        function getInsumoById(id, nombresFallback = []) {
+            let item = datosNegocio.ingredientes.find(i => i.id === id);
+            if (!item) {
+                // Si por alguna razón se borró, buscar por texto o devolver 0
+                item = datosNegocio.ingredientes.find(i => nombresFallback.some(n => i.nombre.toLowerCase().includes(n.toLowerCase()))) 
+                       || { precio: 0, costoTanda: 0, usoTanda: 0, presentacion: '', uso: '' };
+            }
+            return item;
+        }
+
+        function calcularCostoTotalTanda() {
+            return datosNegocio.ingredientes.reduce((sum, item) => sum + (Number(item.costoTanda) || 0), 0);
+        }
+
+        function obtenerStockPaquetes() {
+            const totalProducidos = datosNegocio.tandas.reduce((sum, t) => sum + (Number(t.paquetes) || 0), 0);
+            const totalVendidos = datosNegocio.ventas.reduce((sum, v) => sum + (Number(v.cantidad) || 0), 0);
+            return { producidos: totalProducidos, vendidos: totalVendidos, disponibles: totalProducidos - totalVendidos };
+        }
+
+        // --- RENDERIZADO: COSTOS E INSUMOS ---
+        function renderizarCostos() {
+            const tbody = document.getElementById('tabla-costos-ingredientes');
+            tbody.innerHTML = '';
+            
+            datosNegocio.ingredientes.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-beige/30 transition';
+                tr.innerHTML = `
+                    <td class="p-3.5 font-medium text-chocolate">${item.nombre}</td>
+                    <td class="p-3.5 text-right">${formatoCOP(item.precio)}</td>
+                    <td class="p-3.5 text-center text-xs text-amber-900/80">${item.presentacion}</td>
+                    <td class="p-3.5 text-center text-xs text-amber-900/80">${item.uso}</td>
+                    <td class="p-3.5 text-right font-semibold text-chocolate">${formatoCOP(item.costoTanda)}</td>
+                    <td class="p-3.5 text-center whitespace-nowrap">
+                        <button onclick="abrirModalInsumo(${item.id})" class="text-amber-900/60 hover:text-caramel transition mr-2" title="Editar precio o cantidad"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="eliminarInsumo(${item.id})" class="text-amber-900/60 hover:text-red-700 transition" title="Eliminar"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('total-costo-general').innerText = formatoCOP(calcularCostoTotalTanda());
+        }
+
+        function abrirModalInsumo(id = null) {
+            const esEdicion = id !== null;
+            document.getElementById('modal-insumo-title').innerText = esEdicion ? "Editar Insumo" : "Añadir Nuevo Insumo";
+            
+            if (esEdicion) {
+                const item = datosNegocio.ingredientes.find(i => i.id === id);
+                document.getElementById('insumo-id').value = item.id;
+                document.getElementById('insumo-nombre').value = item.nombre;
+                document.getElementById('insumo-precio').value = item.precio;
+                document.getElementById('insumo-costo-tanda').value = item.costoTanda;
+                document.getElementById('insumo-presentacion').value = item.presentacion;
+                document.getElementById('insumo-uso').value = item.uso;
+                document.getElementById('insumo-uso-num').value = item.usoTanda || 0;
+                document.getElementById('insumo-unidad').value = item.unidad || '';
+            } else {
+                document.getElementById('insumo-id').value = '';
+                document.getElementById('insumo-nombre').value = '';
+                document.getElementById('insumo-precio').value = '';
+                document.getElementById('insumo-costo-tanda').value = '';
+                document.getElementById('insumo-presentacion').value = '';
+                document.getElementById('insumo-uso').value = '';
+                document.getElementById('insumo-uso-num').value = '';
+                document.getElementById('insumo-unidad').value = '';
+            }
+            document.getElementById('modal-insumo').classList.remove('hidden');
+        }
+
+        function cerrarModalInsumo() { document.getElementById('modal-insumo').classList.add('hidden'); }
+
+        function guardarInsumo() {
+            const nombre = document.getElementById('insumo-nombre').value;
+            if (!nombre) return alert("El nombre es obligatorio");
+
+            const idField = document.getElementById('insumo-id').value;
+            const nuevoInsumo = {
+                id: idField ? parseInt(idField) : Date.now(),
+                nombre: nombre,
+                precio: parseFloat(document.getElementById('insumo-precio').value) || 0,
+                costoTanda: parseFloat(document.getElementById('insumo-costo-tanda').value) || 0,
+                presentacion: document.getElementById('insumo-presentacion').value,
+                uso: document.getElementById('insumo-uso').value,
+                usoTanda: parseFloat(document.getElementById('insumo-uso-num').value) || 0,
+                unidad: document.getElementById('insumo-unidad').value,
+                stockActual: 0 // Default, se edita en despensa
+            };
+
+            if (idField) {
+                const index = datosNegocio.ingredientes.findIndex(i => i.id == idField);
+                nuevoInsumo.stockActual = datosNegocio.ingredientes[index].stockActual; // Mantener stock
+                datosNegocio.ingredientes[index] = nuevoInsumo;
+                mostrarToast("Insumo actualizado.");
+            } else {
+                datosNegocio.ingredientes.push(nuevoInsumo);
+                mostrarToast("Insumo agregado.");
+            }
+
+            guardarDatosLocales();
+            cerrarModalInsumo();
+            actualizarTodo();
+        }
+
+        function eliminarInsumo(id) {
+            if (confirm("¿Segura de eliminar este insumo? Afectará los costos totales.")) {
+                datosNegocio.ingredientes = datosNegocio.ingredientes.filter(i => i.id !== id);
+                guardarDatosLocales();
+                actualizarTodo();
+                mostrarToast("Insumo eliminado.");
+            }
+        }
+
+        // --- RENDERIZADO: SALSAS Y EMPAQUES (Automáticos) ---
+        function renderizarSalsasYEmpaque() {
+            // SALSAS (IDs: 4 crema, 5 leche, 3 cacao, 9 mantequilla, 8 recipientes)
+            const crema = getInsumoById(4, ["crema de leche"]);
+            const leche = getInsumoById(5, ["leche"]);
+            const cacao = getInsumoById(3, ["cacao"]);
+            const mant = getInsumoById(9, ["mantequilla"]);
+            const recip = getInsumoById(8, ["recipientes"]);
+
+            const divIng = document.getElementById('salsas-ingredientes-list');
+            divIng.innerHTML = '';
+            
+            [crema, leche, cacao, mant].forEach(ing => {
+                if(ing.nombre) {
+                    divIng.innerHTML += `
+                        <div class="flex justify-between items-center p-3 bg-beige/40 rounded-xl">
+                            <div><p class="font-medium text-chocolate">${ing.nombre}</p><p class="text-xs text-amber-900/70">Precio: ${formatoCOP(ing.precio)} / Uso: ${ing.uso}</p></div>
+                            <span class="font-bold text-chocolate">${formatoCOP(ing.costoTanda)}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            const costoIngSalsa = (crema.costoTanda||0) + (leche.costoTanda||0) + (cacao.costoTanda||0) + (mant.costoTanda||0);
+            document.getElementById('salsa-ing-total').innerText = formatoCOP(costoIngSalsa);
+            document.getElementById('salsa-recipientes-costo').innerText = formatoCOP(recip.costoTanda||0);
+            document.getElementById('salsa-total-final').innerText = formatoCOP(costoIngSalsa + (recip.costoTanda||0));
+
+            // EMPAQUE (IDs: 7 envases, 8 recipientes)
+            const envases = getInsumoById(7, ["envases"]);
+            const containerEmpaque = document.getElementById('empaque-cards-container');
+            containerEmpaque.innerHTML = '';
+
+            [
+                { icon: 'fa-box', ref: envases, desc: 'Envases para galletas (Paquetes)' },
+                { icon: 'fa-jar', ref: recip, desc: 'Recipientes para Salsas individuales' }
+            ].forEach(e => {
+                if(e.ref.nombre) {
+                    const unitPrice = e.ref.precio / (parseFloat(e.ref.presentacion) || 1);
+                    containerEmpaque.innerHTML += `
+                        <div class="bg-white rounded-2xl card-shadow border border-caramel/20 p-6 space-y-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-beige text-chocolate flex items-center justify-center text-xl"><i class="fa-solid ${e.icon}"></i></div>
+                                <div><h3 class="font-serif text-lg font-bold text-chocolate">${e.ref.nombre}</h3><p class="text-xs text-amber-900/70">${e.desc}</p></div>
+                            </div>
+                            <hr class="border-beige">
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between"><span class="text-amber-900/80">Costo unitario aprox:</span><span class="font-semibold">${formatoCOP(unitPrice)}</span></div>
+                                <div class="flex justify-between"><span class="text-amber-900/80">Uso por tanda:</span><span class="font-semibold">${e.ref.usoTanda || e.ref.uso}</span></div>
+                                <div class="flex justify-between font-bold text-chocolate border-t pt-2"><span>Costo en la tanda:</span><span>${formatoCOP(e.ref.costoTanda)}</span></div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // --- RENDERIZADO: INVENTARIO Y DESPENSA ---
+        function actualizarStockInsumo(id, val) {
+            const item = datosNegocio.ingredientes.find(i => i.id === id);
+            if(item) {
+                item.stockActual = parseFloat(val) || 0;
+                guardarDatosLocales();
+                renderizarDespensa();
+            }
+        }
+
+        function renderizarDespensa() {
+            const stock = obtenerStockPaquetes();
+            document.getElementById('inv-producidos').innerText = stock.producidos;
+            document.getElementById('inv-vendidos').innerText = stock.vendidos;
+            document.getElementById('inv-disponibles').innerText = stock.disponibles;
+            document.getElementById('inv-valor').innerText = formatoCOP(stock.disponibles * datosNegocio.precioVenta);
+
+            const tbody = document.getElementById('tabla-despensa');
+            tbody.innerHTML = '';
+
+            datosNegocio.ingredientes.forEach(item => {
+                if(!item.unidad) return; // Si no tiene unidad configurada, no la mostramos en despensa
+                
+                const requiere = item.usoTanda || 0;
+                const tiene = item.stockActual || 0;
+                const falta = Math.max(0, requiere - tiene);
+                
+                let alertaCss = falta > 0 ? 'text-red-700 font-bold bg-red-50' : 'text-green-700 font-bold';
+                let iconFalta = falta > 0 ? '<i class="fa-solid fa-cart-shopping mr-1"></i> ' : '<i class="fa-solid fa-check mr-1"></i> Completo';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3.5 font-medium text-chocolate">${item.nombre}</td>
+                    <td class="p-3.5 text-center text-amber-900/80">${requiere} ${item.unidad}</td>
+                    <td class="p-3.5 text-center bg-beige/20">
+                        <input type="number" step="any" class="w-20 p-1 text-center border border-caramel/30 rounded-lg outline-none focus:border-caramel" 
+                               value="${tiene}" onchange="actualizarStockInsumo(${item.id}, this.value)"> <span class="text-xs">${item.unidad}</span>
+                    </td>
+                    <td class="p-3.5 text-center ${alertaCss} rounded-r-lg">
+                        ${falta > 0 ? iconFalta + falta + ' ' + item.unidad : iconFalta}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- RENDERIZADO: TANDAS (PRODUCCIÓN) ---
+        function registrarTanda() {
+            const fecha = document.getElementById('tanda-fecha').value;
+            const horneadas = parseInt(document.getElementById('tanda-galletas').value) || 0;
+            const consumo = parseInt(document.getElementById('tanda-consumo').value) || 0;
+            
+            if(!fecha || horneadas === 0) return alert("Ingresa fecha y cantidad horneada");
+
+            const utiles = horneadas - consumo;
+            const paquetes = Math.floor(utiles / 10); // 10 galletas por paquete
+
+            datosNegocio.tandas.push({ id: Date.now(), fecha, galletas: horneadas, consumo, utiles, paquetes });
+            guardarDatosLocales();
+            
+            document.getElementById('tanda-galletas').value = '';
+            document.getElementById('tanda-consumo').value = '';
+            
+            mostrarToast(`Tanda registrada: ${paquetes} paquetes agregados.`);
+            actualizarTodo();
+        }
+
+        function renderizarTandas() {
+            const tbody = document.getElementById('tabla-tandas');
+            tbody.innerHTML = '';
+            [...datosNegocio.tandas].reverse().forEach(t => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-3.5 text-amber-900">${t.fecha}</td>
+                        <td class="p-3.5 text-center text-chocolate">${t.galletas}</td>
+                        <td class="p-3.5 text-center text-red-600/80">${t.consumo}</td>
+                        <td class="p-3.5 text-center text-chocolate">${t.utiles}</td>
+                        <td class="p-3.5 text-right font-bold text-caramel text-lg">+ ${t.paquetes}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- RENDERIZADO: VENTAS ---
+        function registrarVenta() {
+            const fecha = document.getElementById('venta-fecha').value;
+            const cant = parseInt(document.getElementById('venta-cantidad').value);
+            
+            if(!fecha || !cant || cant <= 0) return alert("Verifica la fecha y cantidad.");
+            
+            const stock = obtenerStockPaquetes();
+            if(cant > stock.disponibles) return alert("¡No tienes suficientes paquetes en stock para esta venta!");
+
+            const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            const diaFecha = new Date(fecha);
+            let diaIndex = diaFecha.getDay(); // 0 es Domingo
+            let nombreDia = diaIndex === 0 ? 'Domingo' : diasSemana[diaIndex - 1];
+
+            datosNegocio.ventas.push({ id: Date.now(), fecha, dia: nombreDia, cantidad: cant, precioUnitario: datosNegocio.precioVenta });
+            guardarDatosLocales();
+            
+            document.getElementById('venta-cantidad').value = '';
+            mostrarToast("Venta registrada con éxito.");
+            actualizarTodo();
+        }
+
+        function renderizarVentas() {
+            const tbody = document.getElementById('tabla-ventas');
+            tbody.innerHTML = '';
+            [...datosNegocio.ventas].reverse().forEach(v => {
+                const total = v.cantidad * v.precioUnitario;
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-4 text-amber-900">${v.fecha}</td>
+                        <td class="p-4 text-center text-xs text-caramel font-bold">${v.dia}</td>
+                        <td class="p-4 text-center font-bold text-chocolate">${v.cantidad}</td>
+                        <td class="p-4 text-right">${formatoCOP(v.precioUnitario)}</td>
+                        <td class="p-4 text-right font-bold text-green-700">${formatoCOP(total)}</td>
+                        <td class="p-4 text-center"><button onclick="eliminarVenta('${v.id}')" class="text-red-500 hover:text-red-700 transition"><i class="fa-solid fa-trash-can"></i></button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function eliminarVenta(id) {
+            if(confirm("¿Estás segura de eliminar esta venta? Esto regresará los paquetes al inventario.")) {
+                // Comparamos convirtiendo a texto para evitar cualquier error de formato en la memoria
+                datosNegocio.ventas = datosNegocio.ventas.filter(v => String(v.id) !== String(id));
+                guardarDatosLocales();
+                actualizarTodo();
+                mostrarToast("Venta eliminada correctamente.");
+            }
+        }
+
+        // --- DASHBOARD Y GANANCIAS ---
+        function actualizarPrecioVenta() {
+            datosNegocio.precioVenta = parseFloat(document.getElementById('precio-venta-input').value) || 0;
+            guardarDatosLocales();
+            actualizarTodo();
+            mostrarToast("Precio de venta actualizado.");
+        }
+
+        function renderizarDashboardYPrecios() {
+            const costoTotalTanda = calcularCostoTotalTanda();
+            const costoPorPaquete = costoTotalTanda / 12; // Base de la receta (12 pqts por tanda)
+            const gananciaUnitaria = datosNegocio.precioVenta - costoPorPaquete;
+            
+            // Pestaña de Precios
+            document.getElementById('precio-venta-input').value = datosNegocio.precioVenta;
+            document.getElementById('resumen-costo-tanda').innerText = formatoCOP(costoTotalTanda);
+            document.getElementById('resumen-costo-paquete').innerText = formatoCOP(costoPorPaquete);
+            document.getElementById('resumen-ganancia-paquete').innerText = formatoCOP(gananciaUnitaria);
+
+            // Dashboard
+            const ingresosTotales = datosNegocio.ventas.reduce((sum, v) => sum + (v.cantidad * v.precioUnitario), 0);
+            const paquetesVendidos = datosNegocio.ventas.reduce((sum, v) => sum + v.cantidad, 0);
+            const gananciaTotal = paquetesVendidos * gananciaUnitaria;
+            const stock = obtenerStockPaquetes();
+
+            document.getElementById('dash-ingresos').innerText = formatoCOP(ingresosTotales);
+            document.getElementById('dash-ganancia').innerText = formatoCOP(gananciaTotal);
+            document.getElementById('dash-vendidos').innerText = paquetesVendidos;
+            document.getElementById('dash-stock').innerHTML = `${stock.disponibles} <span class="text-sm font-normal">paquetes</span>`;
+
+            // Días de la semana
+            const dias = { 'Lunes': { q: 0, v: 0 }, 'Martes': { q: 0, v: 0 }, 'Miércoles': { q: 0, v: 0 }, 'Jueves': { q: 0, v: 0 }, 'Viernes': { q: 0, v: 0 }, 'Sábado': { q: 0, v: 0 }, 'Domingo': { q: 0, v: 0 } };
+            datosNegocio.ventas.forEach(v => { if(dias[v.dia]) { dias[v.dia].q += v.cantidad; dias[v.dia].v += (v.cantidad * v.precioUnitario); } });
+
+            const tDias = document.getElementById('tabla-dias');
+            tDias.innerHTML = '';
+            Object.keys(dias).forEach(dia => {
+                const gananciaDia = dias[dia].q * gananciaUnitaria;
+                let bgRow = dias[dia].q > 0 ? 'bg-caramel/10' : '';
+                tDias.innerHTML += `
+                    <tr class="${bgRow} transition">
+                        <td class="p-4 font-medium text-chocolate">${dia}</td>
+                        <td class="p-4 text-center font-bold text-chocolate">${dias[dia].q}</td>
+                        <td class="p-4 text-right">${formatoCOP(dias[dia].v)}</td>
+                        <td class="p-4 text-right font-bold text-green-700">${formatoCOP(gananciaDia)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- INICIALIZACIÓN PRINCIPAL ---
+        function actualizarTodo() {
+            renderizarCostos();
+            renderizarSalsasYEmpaque();
+            renderizarTandas();
+            renderizarDespensa();
+            renderizarVentas();
+            renderizarDashboardYPrecios();
+        }
+
+        window.onload = function() {
+            cargarDatosLocales();
+            
+            // Establecer fecha por defecto en los inputs de fecha hoy
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('venta-fecha').value = hoy;
+            document.getElementById('tanda-fecha').value = hoy;
+
+            actualizarTodo();
+        }
+    </script>
+</body>
+</html>
